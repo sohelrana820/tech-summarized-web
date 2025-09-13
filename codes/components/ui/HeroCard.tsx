@@ -56,15 +56,15 @@ export function HeroCard({
             <span className="text-sm font-medium">Updated {updatedAt}</span>
           </div>
           
-          <Button 
-            variant="primary" 
-            size="lg"
-            onClick={onReadMore}
-            className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200"
-          >
-            Read Full Overview
-            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={onReadMore}
+          className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300"
+        >
+          Read Full Overview
+          <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+        </Button>
         </div>
       </div>
     </div>

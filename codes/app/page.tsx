@@ -57,20 +57,23 @@ export default function Home() {
               return (
                 <Card
                   key={overview.id}
-                  hover
+                  hover={false}
                   onClick={() => handleCardClick(overview)}
-                  className="h-full group"
+                  className="h-full group relative"
                 >
-                  <CardContent className="p-6 h-full flex flex-col">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full font-medium">
-                        {timeAgo}
-                      </span>
+                  <CardContent className="p-8 h-full flex flex-col">
+                    <div className="flex items-center justify-between mb-8">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full font-medium border border-slate-200/50 dark:border-slate-700/50">
+                          {timeAgo}
+                        </span>
+                      </div>
                     </div>
                   
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {overview.title}
-                  </h3>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 line-clamp-2 leading-tight">
+                      {overview.title}
+                    </h3>
                   
                     <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-3 flex-grow leading-relaxed">
                       {overview.short_description}

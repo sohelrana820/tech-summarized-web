@@ -15,10 +15,10 @@ export function Card({ children, className, hover = false, onClick }: CardProps)
     <div
       className={clsx(
         'relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-slate-800/60',
-        'bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm',
-        'shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50',
-        'transition-all duration-300 ease-out',
-        hover && 'hover:shadow-xl hover:shadow-slate-300/60 dark:hover:shadow-slate-800/60 hover:scale-[1.02] hover:-translate-y-1 cursor-pointer',
+        'bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl',
+        'shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40',
+        'transition-all duration-500 ease-out',
+        hover && 'hover:shadow-2xl hover:shadow-slate-300/50 dark:hover:shadow-slate-800/50 hover:scale-[1.02] hover:-translate-y-2 hover:border-blue-300/50 dark:hover:border-blue-600/50 cursor-pointer',
         onClick && 'cursor-pointer',
         className
       )}

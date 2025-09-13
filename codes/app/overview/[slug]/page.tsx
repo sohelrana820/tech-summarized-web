@@ -15,8 +15,10 @@ import {
   getUnreadContentIds
 } from '@/lib/localStorage';
 import { FilterType } from '@/types';
-import { CheckCircle, RotateCcw, Eye, EyeOff, ArrowLeft, Clock } from 'lucide-react';
+import { RotateCcw, Eye, EyeOff, ArrowLeft, ArrowRight, Clock, BookOpen, CheckCircle, Sparkles, Target } from 'lucide-react';
 import { useTimeAgo } from '@/hooks/useTimeAgo';
+import { ContentItem } from '@/components/ContentItem';
+import { SocialShare } from '@/components/SocialShare';
 
 export default function OverviewDetailsPage() {
   const params = useParams();
@@ -98,6 +100,21 @@ export default function OverviewDetailsPage() {
 
   const filteredContent = getFilteredContent();
 
+  // Find previous overview (based on creation date)
+  const getPreviousOverview = () => {
+    const currentOverview = overview;
+    if (!currentOverview) return null;
+    
+    const sortedOverviews = [...sampleOverviews].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    
+    const currentIndex = sortedOverviews.findIndex(o => o.id === currentOverview.id);
+    return currentIndex < sortedOverviews.length - 1 ? sortedOverviews[currentIndex + 1] : null;
+  };
+
+  const previousOverview = getPreviousOverview();
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -105,14 +122,43 @@ export default function OverviewDetailsPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-12">
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/')}
-            className="mb-6 group"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
-          </Button>
+                <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                  {/* Return to Overview Button */}
+                  <button
+                    onClick={() => router.push('/')}
+                    className="group inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-slate-100 hover:to-slate-200 dark:hover:from-slate-700 dark:hover:to-slate-600 border border-slate-200 dark:border-slate-600 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-sm group-hover:shadow-md transition-all duration-300">
+                      <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-0.5 transition-transform duration-300" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-semibold">Return to Overview</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors duration-300">
+                        Explore more tech insights
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Previous Overview Button */}
+                  {previousOverview && (
+                    <button
+                      onClick={() => router.push(`/overview/${previousOverview.slug}`)}
+                      className="group inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/30 dark:hover:to-teal-900/30 border border-emerald-200 dark:border-emerald-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-100"
+                    >
+                      <div className="text-right">
+                        <div className="text-sm font-semibold">Waiting for you</div>
+                        <div className="text-xs text-emerald-500 dark:text-emerald-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors duration-300">
+                          {previousOverview.title.length > 35 
+                            ? `${previousOverview.title.substring(0, 35)}...` 
+                            : previousOverview.title}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 shadow-sm group-hover:shadow-md transition-all duration-300">
+                        <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform duration-300" />
+                      </div>
+                    </button>
+                  )}
+                </div>
           
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-white dark:via-slate-100 dark:to-white bg-clip-text text-transparent mb-6 leading-tight">
             {overview.title}
@@ -128,29 +174,36 @@ export default function OverviewDetailsPage() {
           </div>
         </div>
 
+        {/* Social Share */}
+        <div className="mb-6">
+          <SocialShare
+            title={overview.title}
+            url={`https://techsummarized.com/overview/${overview.slug}`}
+            description={overview.short_description}
+          />
+        </div>
+
         {/* Controls */}
         <div className="mb-12">
-          <div className="flex flex-wrap gap-3 mb-6">
+          <div className="flex flex-wrap gap-3">
             <Button
               variant={filter === 'unread' ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => setFilter('unread')}
-              className="group"
+              icon={<EyeOff className="w-4 h-4" />}
             >
-              <EyeOff className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
               Show Unread ({unreadContentIds.length})
             </Button>
-            
+
             <Button
               variant={filter === 'read' ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => setFilter('read')}
-              className="group"
+              icon={<Eye className="w-4 h-4" />}
             >
-              <Eye className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
               Show Read ({readContentIds.length})
             </Button>
-            
+
             <Button
               variant={filter === 'all' ? 'primary' : 'secondary'}
               size="sm"
@@ -158,88 +211,141 @@ export default function OverviewDetailsPage() {
             >
               Show All ({allContentIds.length})
             </Button>
+
+            <Button
+              variant="action"
+              size="sm"
+              onClick={handleReset}
+              icon={<RotateCcw className="w-4 h-4" />}
+            >
+              Start Over / Reset
+            </Button>
           </div>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="group"
-          >
-            <RotateCcw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform" />
-            Start Over / Reset
-          </Button>
         </div>
 
         {/* Content Cards */}
         <div className="space-y-8">
           {filteredContent.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <div className="text-6xl mb-4">
-                  {filter === 'read' ? '📚' : filter === 'unread' ? '🎉' : '📄'}
+            <Card className="animate-fade-in overflow-hidden">
+              <CardContent className="p-12 pt-16 text-center relative">
+                {/* Background decoration */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-pink-50/50 dark:from-blue-900/20 dark:via-purple-900/10 dark:to-pink-900/10" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-2xl -translate-y-16 translate-x-16" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-400/10 to-pink-400/10 rounded-full blur-2xl translate-y-12 -translate-x-12" />
+                
+                <div className="relative z-10">
+                  {/* Icon with gradient background */}
+                  <div className="inline-flex items-center justify-center w-20 h-20 mb-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25">
+                    {filter === 'read' ? (
+                      <BookOpen className="w-10 h-10 text-white" />
+                    ) : filter === 'unread' ? (
+                      <CheckCircle className="w-10 h-10 text-white" />
+                    ) : (
+                      <Target className="w-10 h-10 text-white" />
+                    )}
+                  </div>
+                  
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
+                    {filter === 'read'
+                      ? 'No Read Items Yet'
+                      : filter === 'unread'
+                      ? 'All Caught Up!'
+                      : 'No Content Available'}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-slate-600 dark:text-slate-400 text-lg mb-6 max-w-md mx-auto leading-relaxed">
+                    {filter === 'read'
+                      ? 'You haven\'t marked any items as read yet. Start exploring the content below and mark items as read to see them here.'
+                      : filter === 'unread'
+                      ? 'Congratulations! You\'ve read all the available content. Check back later for new updates or reset to review everything again.'
+                      : 'There\'s no content available at the moment. Please try again later.'}
+                  </p>
+                  
+                  {/* Action buttons */}
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    {filter === 'read' ? (
+                      <>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => setFilter('unread')}
+                          icon={<EyeOff className="w-4 h-4" />}
+                        >
+                          View Unread Items
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setFilter('all')}
+                          icon={<BookOpen className="w-4 h-4" />}
+                        >
+                          Show All Content
+                        </Button>
+                      </>
+                    ) : filter === 'unread' ? (
+                      <>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={handleReset}
+                          icon={<RotateCcw className="w-4 h-4" />}
+                        >
+                          Start Over
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setFilter('read')}
+                          icon={<BookOpen className="w-4 h-4" />}
+                        >
+                          View Read Items
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => router.push('/')}
+                        icon={<ArrowLeft className="w-4 h-4" />}
+                      >
+                        Back to Home
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {/* Decorative elements */}
+                  <div className="flex items-center justify-center gap-2 mt-8">
+                    <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
+                    <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                      {filter === 'read' ? 'Start your reading journey' : filter === 'unread' ? 'Great job staying updated!' : 'Content coming soon'}
+                    </span>
+                    <Sparkles className="w-4 h-4 text-purple-500 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                  </div>
                 </div>
-                <p className="text-slate-500 dark:text-slate-400 text-lg">
-                  {filter === 'read' 
-                    ? 'No read items to display.' 
-                    : filter === 'unread' 
-                    ? 'All items have been read! 🎉' 
-                    : 'No content available.'}
-                </p>
               </CardContent>
             </Card>
           ) : (
-            filteredContent.map((contentItem) => {
-              const isRead = isContentRead(slugParam, contentItem.id.toString());
-              const contentTimeAgo = useTimeAgo(contentItem.pub_date);
-              
-              return (
-                <Card key={contentItem.id} className="relative group">
-                  <CardContent className="p-8">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 pr-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">
-                            {contentItem.source}
-                          </span>
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
-                            {contentTimeAgo}
-                          </span>
-                        </div>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 leading-tight">
-                          {contentItem.title}
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg mb-4">
-                          {contentItem.summary}
-                        </p>
-                        {contentItem.link && (
-                          <a 
-                            href={contentItem.link} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
-                          >
-                            Read original article →
-                          </a>
-                        )}
-                      </div>
-                      
-                      <button
-                        onClick={() => handleMarkAsRead(contentItem.id)}
-                        className={`flex-shrink-0 w-12 h-12 rounded-full border-2 transition-all duration-300 group-hover:scale-110 ${
-                          isRead
-                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/25'
-                            : 'border-slate-300 dark:border-slate-600 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow-lg hover:shadow-green-500/25'
-                        }`}
-                        aria-label={isRead ? 'Mark as unread' : 'Mark as read'}
-                      >
-                        {isRead && <CheckCircle className="w-6 h-6 mx-auto" />}
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })
+            <div className="space-y-8">
+              {filteredContent.map((contentItem, index) => {
+                const isRead = isContentRead(slugParam, contentItem.id.toString());
+
+                return (
+                  <div
+                    key={contentItem.id}
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <ContentItem
+                      contentItem={contentItem}
+                      isRead={isRead}
+                      onMarkAsRead={handleMarkAsRead}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </main>
