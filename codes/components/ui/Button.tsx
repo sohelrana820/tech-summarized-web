@@ -25,7 +25,7 @@ export function Button({
   useEffect(() => {
     setMounted(true);
   }, []);
-  const baseClasses = `inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group ${noBounce ? '' : 'hover:scale-105'}`;
+  const baseClasses = `inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group whitespace-nowrap ${noBounce ? '' : 'hover:scale-105'}`;
   
   const variants = {
     primary: 'bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 focus:ring-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40',
@@ -59,8 +59,8 @@ export function Button({
         <div className="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-300" />
       )}
       
-      {icon && <span className="relative z-10">{icon}</span>}
-      <span className="relative z-10">{children}</span>
+      {icon && <span className="relative z-10 flex-shrink-0">{icon}</span>}
+      <span className="relative z-10 whitespace-nowrap">{children}</span>
     </button>
   );
 }

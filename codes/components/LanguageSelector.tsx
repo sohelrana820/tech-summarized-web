@@ -21,6 +21,7 @@ const languages = [
   { code: 'zh', name: '中文', flag: '🇨🇳' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
   { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
 ];
 
 export function LanguageSelector({ onLanguageChange, currentLanguage }: LanguageSelectorProps) {
@@ -63,7 +64,7 @@ export function LanguageSelector({ onLanguageChange, currentLanguage }: Language
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto" style={{ zIndex: 999999 }}>
+        <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto" style={{ zIndex: 999999999 }}>
           {languages.map((language) => (
             <button
               key={language.code}

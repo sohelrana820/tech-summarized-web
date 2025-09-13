@@ -51,7 +51,7 @@ export default function OverviewDetailsPage() {
     return (
       <div className="min-h-screen">
         <Header />
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 overflow-visible">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
               Overview Not Found
@@ -116,10 +116,10 @@ export default function OverviewDetailsPage() {
   const previousOverview = getPreviousOverview();
 
   return (
-    <div className="min-h-screen">
+    <div>
       <Header />
       
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
         {/* Header */}
         <div className="mb-12">
                 <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
@@ -224,7 +224,7 @@ export default function OverviewDetailsPage() {
         </div>
 
         {/* Content Cards */}
-        <div className="space-y-8">
+        <div className="space-y-8 overflow-visible">
           {filteredContent.length === 0 ? (
             <Card className="animate-fade-in overflow-hidden">
               <CardContent className="p-12 pt-16 text-center relative">

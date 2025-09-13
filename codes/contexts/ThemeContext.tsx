@@ -22,8 +22,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const storedTheme = getStoredTheme();
     setThemeState(storedTheme);
     
-    const updateResolvedTheme = () => {
-      const resolved = storedTheme === 'system' ? getSystemTheme() : storedTheme;
+    const updateResolvedTheme = (theme: Theme) => {
+      const resolved = theme === 'system' ? getSystemTheme() : theme;
       setResolvedTheme(resolved);
       // Apply theme to document
       if (resolved === 'dark') {
@@ -33,14 +33,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    updateResolvedTheme();
+    updateResolvedTheme(storedTheme);
     setMounted(true);
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
       if (storedTheme === 'system') {
-        updateResolvedTheme();
+        updateResolvedTheme(storedTheme);
       }
     };
 
@@ -72,7 +72,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 transition-all duration-300">
+      <div className="min-h-screen bg-white dark:bg-slate-900 transition-all duration-300">
         {children}
       </div>
     </ThemeContext.Provider>

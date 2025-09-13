@@ -60,8 +60,8 @@ export function ContentItem({ contentItem, isRead, onMarkAsRead }: ContentItemPr
   };
 
   return (
-    <Card className="relative group transition-all duration-300 ease-out hover:shadow-lg hover:shadow-slate-300/50 dark:hover:shadow-slate-800/50">
-      <CardContent className="p-8 pt-12 relative">
+    <Card className="relative group transition-all duration-300 ease-out hover:shadow-lg hover:shadow-slate-300/50 dark:hover:shadow-slate-800/50 overflow-visible" style={{ zIndex: 1 }}>
+      <CardContent className="p-8 pt-12 relative overflow-visible">
         <div className="flex items-start">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-4">
@@ -89,8 +89,26 @@ export function ContentItem({ contentItem, isRead, onMarkAsRead }: ContentItemPr
               )}
             </div>
             
-            {/* Bottom section with Read Original Article and Translation */}
-            <div className="flex items-center justify-between mt-4">
+            {/* Bottom section with Translation */}
+            <div className="flex items-center justify-start mt-4 relative" style={{ zIndex: 1 }}>
+              {/* Translation Section */}
+              <div className="flex items-center gap-2">
+                <Languages className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+                <span className="text-sm text-slate-500 dark:text-slate-400">Translate into</span>
+                <LanguageSelector 
+                  onLanguageChange={handleLanguageChange} 
+                  currentLanguage={selectedLanguage}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Action buttons section at bottom */}
+        <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 relative" style={{ zIndex: 1 }}>
+          <div className="flex items-center justify-between">
+            {/* Left side - Read Original Article */}
+            <div className="flex items-center">
               {contentItem.link && (
                 <a
                   href={contentItem.link}
@@ -102,23 +120,9 @@ export function ContentItem({ contentItem, isRead, onMarkAsRead }: ContentItemPr
                   Read Original Article
                 </a>
               )}
-              
-              {/* Translation Section */}
-              <div className="flex items-center gap-2">
-                <Languages className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-                <LanguageSelector 
-                  onLanguageChange={handleLanguageChange} 
-                  currentLanguage={selectedLanguage}
-                />
-              </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Action buttons section at bottom */}
-        <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 relative" style={{ zIndex: 100000 }}>
-          <div className="flex items-center justify-between">
-            {/* Left side - Action buttons */}
+            
+            {/* Center - Chat & Details buttons aligned with circle */}
             <div className="flex items-center gap-4">
               {/* Details Icon */}
               <button
@@ -151,26 +155,38 @@ export function ContentItem({ contentItem, isRead, onMarkAsRead }: ContentItemPr
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-violet-500 rounded-full animate-pulse" />
                 )}
               </button>
+              
+              {/* Read indicator circle */}
+              <button
+                onClick={handleMarkAsRead}
+                className={`group relative p-3 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg ${
+                  isMarkingAsRead 
+                    ? 'scale-110 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/30 dark:hover:to-emerald-900/30 shadow-lg shadow-green-500/25'
+                    : isRead
+                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/30 dark:hover:to-emerald-900/30 shadow-md shadow-green-500/25'
+                    : 'bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-800/20 dark:to-gray-800/20 hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/20 dark:hover:to-emerald-900/20 hover:shadow-md hover:shadow-green-500/25'
+                }`}
+                aria-label={isRead ? 'Mark as unread' : 'Mark as read'}
+                title={isRead ? 'Mark as unread' : 'Mark as read'}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 transition-all duration-200 ease-out relative overflow-hidden ${
+                  isMarkingAsRead 
+                    ? 'bg-gradient-to-r from-green-400 to-emerald-400 border-green-400 text-white shadow-lg shadow-green-400/50'
+                    : isRead
+                    ? 'bg-gradient-to-r from-green-400 to-emerald-400 border-green-400 text-white shadow-md shadow-green-400/30'
+                    : 'border-slate-300 dark:border-slate-600 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow-md hover:shadow-green-400/30'
+                }`}>
+                  {/* Shimmer effect - only render on client to prevent hydration issues */}
+                  {mounted && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  )}
+                  {(isRead || isMarkingAsRead) && <Check className="w-3 h-3 mx-auto relative z-10" />}
+                </div>
+                {(isRead || isMarkingAsRead) && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                )}
+              </button>
             </div>
-            
-            {/* Right side - Read indicator */}
-            <button
-              onClick={handleMarkAsRead}
-              className={`w-5 h-5 rounded-full border-2 transition-all duration-200 ease-out hover:scale-110 group relative overflow-hidden ${
-                isMarkingAsRead 
-                  ? 'scale-110 bg-gradient-to-r from-green-400 to-emerald-400 border-green-400 text-white shadow-lg shadow-green-400/50'
-                  : isRead
-                  ? 'bg-gradient-to-r from-green-400 to-emerald-400 border-green-400 text-white shadow-md shadow-green-400/30'
-                  : 'border-slate-300 dark:border-slate-600 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow-md hover:shadow-green-400/30'
-              }`}
-              aria-label={isRead ? 'Mark as unread' : 'Mark as read'}
-            >
-              {/* Shimmer effect - only render on client to prevent hydration issues */}
-              {mounted && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-              )}
-              {(isRead || isMarkingAsRead) && <Check className="w-3 h-3 mx-auto relative z-10" />}
-            </button>
           </div>
         </div>
       </CardContent>
