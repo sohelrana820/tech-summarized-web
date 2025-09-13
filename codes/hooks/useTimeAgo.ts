@@ -1,11 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useClientOnly } from './useClientOnly';
 
 export function useTimeAgo(dateString: string): string {
   const [timeAgo, setTimeAgo] = useState('recently');
+  const mounted = useClientOnly();
 
   useEffect(() => {
+    if (!mounted || !dateString) return;
+
     const formatTimeAgo = (dateString: string): string => {
       const date = new Date(dateString);
       const now = new Date();
@@ -22,7 +26,12 @@ export function useTimeAgo(dateString: string): string {
     };
 
     setTimeAgo(formatTimeAgo(dateString));
-  }, [dateString]);
+  }, [dateString, mounted]);
+
+  // Always return 'recently' during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return 'recently';
+  }
 
   return timeAgo;
 }

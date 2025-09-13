@@ -1,22 +1,83 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { sampleOverviews } from '@/data/sampleData';
-import { getSlugFromOverview } from '@/lib/api';
-import { useTimeAgo } from '@/hooks/useTimeAgo';
-import { Clock, ArrowRight, Archive, Calendar } from 'lucide-react';
+import { OverviewCard } from '@/components/OverviewCard';
+import { getSlugFromOverview, fetchOverviews } from '@/lib/api';
+import { Archive, Calendar, Loader2, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Overview } from '@/types';
 
 export default function OverviewArchivePage() {
   const router = useRouter();
+  const [overviews, setOverviews] = useState<Overview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCardClick = (overview: typeof sampleOverviews[0]) => {
+  useEffect(() => {
+    const loadOverviews = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchOverviews();
+        setOverviews(data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load overviews:', err);
+        setError('Failed to load overviews. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadOverviews();
+  }, []);
+
+  const handleCardClick = (overview: Overview) => {
     const slugRoute = getSlugFromOverview(overview);
     router.push(`/overview/${slugRoute}`);
   };
+
+  if (loading) {
+    return (
+      <div>
+        <Header />
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
+              <p className="text-slate-600 dark:text-slate-400">Loading overview archive...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <Header />
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+              {error}
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 mb-8">
+              Please try again later.
+            </p>
+            <Button
+              variant="primary"
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -42,58 +103,13 @@ export default function OverviewArchivePage() {
 
         {/* Overviews Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {sampleOverviews.map((overview, index) => {
-            const overviewTimeAgo = useTimeAgo(overview.updated_at);
-            
-            return (
-              <Card 
-                key={overview.id} 
-                className="group cursor-pointer transition-all duration-300 ease-out hover:shadow-xl hover:shadow-blue-500/15 dark:hover:shadow-blue-500/8 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 hover:border-blue-300/40 dark:hover:border-blue-600/40 flex flex-col h-full relative overflow-hidden"
-                onClick={() => handleCardClick(overview)}
-              >
-                {/* Hover gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/3 via-purple-500/3 to-cyan-500/3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                
-                <CardContent className="p-8 pt-12 flex flex-col h-full relative z-10">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full font-medium">
-                        Overview #{overview.id}
-                      </span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {overviewTimeAgo}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                      {overview.title}
-                    </h3>
-                    
-                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 line-clamp-4 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">
-                      {overview.short_description}
-                    </p>
-                  </div>
-                  
-                  <div className="relative group/btn mt-auto">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      icon={<ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />}
-                      className="relative w-full text-slate-600 dark:text-slate-400 hover:text-white dark:hover:text-white border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 transition-all duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCardClick(overview);
-                      }}
-                    >
-                      <span className="font-medium">Read Overview</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {overviews.map((overview) => (
+            <OverviewCard
+              key={overview.id}
+              overview={overview}
+              onCardClick={handleCardClick}
+            />
+          ))}
         </div>
 
         {/* Call to Action */}

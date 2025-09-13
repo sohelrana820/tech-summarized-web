@@ -1,12 +1,12 @@
 import { Overview, TechContent, ApiResponse } from '@/types';
 
 // API base URL - update this to match your actual API endpoint
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://techsummarized.com/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1052';
 
 // Fetch overviews from the API
 export async function fetchOverviews(): Promise<Overview[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/overviews`);
+    const response = await fetch(`${API_BASE_URL}/posts/daily/overviews`);
     if (!response.ok) {
       throw new Error('Failed to fetch overviews');
     }
@@ -20,10 +20,27 @@ export async function fetchOverviews(): Promise<Overview[]> {
   }
 }
 
-// Fetch tech content for a specific overview
+// Fetch tech content for a specific overview by slug
+export async function fetchTechContentBySlug(slug: string): Promise<TechContent[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts/daily/summarized/${slug}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch tech content');
+    }
+    
+    const data: ApiResponse<TechContent> = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching tech content:', error);
+    // Return empty array as fallback
+    return [];
+  }
+}
+
+// Fetch tech content for a specific overview by ID (legacy support)
 export async function fetchTechContent(overviewId: number): Promise<TechContent[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/summarized?overview_id=${overviewId}`);
+    const response = await fetch(`${API_BASE_URL}/posts/daily/summarized?overview_id=${overviewId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch tech content');
     }
@@ -40,7 +57,7 @@ export async function fetchTechContent(overviewId: number): Promise<TechContent[
 // Fetch all tech content
 export async function fetchAllTechContent(): Promise<TechContent[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/summarized`);
+    const response = await fetch(`${API_BASE_URL}/posts/daily/summarized`);
     if (!response.ok) {
       throw new Error('Failed to fetch tech content');
     }

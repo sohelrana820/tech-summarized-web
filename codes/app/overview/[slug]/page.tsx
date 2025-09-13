@@ -5,8 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { sampleOverviews, sampleTechContent } from '@/data/sampleData';
-import { TechContent } from '@/types';
+import { TechContent, Overview } from '@/types';
 import { 
   markContentAsRead, 
   isContentRead, 
@@ -15,10 +14,11 @@ import {
   getUnreadContentIds
 } from '@/lib/localStorage';
 import { FilterType } from '@/types';
-import { RotateCcw, Eye, EyeOff, ArrowLeft, ArrowRight, Clock, BookOpen, CheckCircle, Sparkles, Target } from 'lucide-react';
+import { RotateCcw, Eye, EyeOff, ArrowLeft, ArrowRight, Clock, BookOpen, CheckCircle, Sparkles, Target, Loader2 } from 'lucide-react';
 import { useTimeAgo } from '@/hooks/useTimeAgo';
 import { ContentItem } from '@/components/ContentItem';
 import { SocialShare } from '@/components/SocialShare';
+import { fetchOverviews, fetchTechContentBySlug } from '@/lib/api';
 
 export default function OverviewDetailsPage() {
   const params = useParams();
@@ -26,26 +26,122 @@ export default function OverviewDetailsPage() {
   const slugParam = params.slug as string;
   
   const [filter, setFilter] = useState<FilterType>('unread');
-  const [overview, setOverview] = useState(
-    sampleOverviews.find(o => o.slug === slugParam)
-  );
+  const [overview, setOverview] = useState<Overview | undefined>(undefined);
   const [content, setContent] = useState<TechContent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [previousOverview, setPreviousOverview] = useState<Overview | null>(null);
   
-  // Use hooks for time formatting to prevent hydration issues
-  const overviewTimeAgo = overview ? useTimeAgo(overview.updated_at) : 'recently';
+  // Use hooks for time formatting to prevent hydration issues - always call hooks in the same order
+  const overviewTimeAgo = useTimeAgo(overview?.updated_at || '');
 
+  // First useEffect - load data
   useEffect(() => {
-    const foundOverview = sampleOverviews.find(o => o.slug === slugParam);
-    
-    if (foundOverview) {
-      const foundContent = sampleTechContent.filter(c => c.overview_id === foundOverview.id);
-      setOverview(foundOverview);
-      setContent(foundContent);
-    } else {
-      setOverview(undefined);
-      setContent([]);
-    }
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch overviews to find the one with matching slug
+        const overviews = await fetchOverviews();
+        const foundOverview = overviews.find(o => o.slug === slugParam);
+        
+        if (foundOverview) {
+          setOverview(foundOverview);
+          
+          // Fetch content for this overview
+          const contentData = await fetchTechContentBySlug(slugParam);
+          setContent(contentData);
+        } else {
+          setOverview(undefined);
+          setContent([]);
+        }
+      } catch (err) {
+        console.error('Failed to load overview data:', err);
+        setError('Failed to load overview data. Please try again later.');
+        setOverview(undefined);
+        setContent([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, [slugParam]);
+
+  // Second useEffect - load previous overview
+  useEffect(() => {
+    const getPreviousOverview = async () => {
+      const currentOverview = overview;
+      if (!currentOverview) return null;
+      
+      try {
+        const overviews = await fetchOverviews();
+        const sortedOverviews = [...overviews].sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        
+        const currentIndex = sortedOverviews.findIndex(o => o.id === currentOverview.id);
+        return currentIndex < sortedOverviews.length - 1 ? sortedOverviews[currentIndex + 1] : null;
+      } catch (error) {
+        console.error('Error fetching previous overview:', error);
+        return null;
+      }
+    };
+
+    if (overview) {
+      getPreviousOverview().then(setPreviousOverview);
+    }
+  }, [overview]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 overflow-visible">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
+              <p className="text-slate-600 dark:text-slate-400">Loading overview content...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 overflow-visible">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Error Loading Overview
+            </h1>
+            <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">
+              {error}
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button
+                variant="primary"
+                onClick={() => window.location.reload()}
+              >
+                Try Again
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/')}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (!overview) {
     return (
@@ -99,21 +195,6 @@ export default function OverviewDetailsPage() {
   };
 
   const filteredContent = getFilteredContent();
-
-  // Find previous overview (based on creation date)
-  const getPreviousOverview = () => {
-    const currentOverview = overview;
-    if (!currentOverview) return null;
-    
-    const sortedOverviews = [...sampleOverviews].sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-    
-    const currentIndex = sortedOverviews.findIndex(o => o.id === currentOverview.id);
-    return currentIndex < sortedOverviews.length - 1 ? sortedOverviews[currentIndex + 1] : null;
-  };
-
-  const previousOverview = getPreviousOverview();
 
   return (
     <div>

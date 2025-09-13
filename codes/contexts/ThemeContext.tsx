@@ -72,7 +72,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <div className="min-h-screen bg-white dark:bg-slate-900 transition-all duration-300">
+      <div className={`min-h-screen transition-all duration-300 ${
+        mounted ? 'bg-white dark:bg-slate-900' : 'bg-white'
+      }`}>
         {children}
       </div>
     </ThemeContext.Provider>

@@ -3,9 +3,11 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useClientOnly } from '@/hooks/useClientOnly';
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme, mounted } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useClientOnly();
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'light' ? 'dark' : 'light');
