@@ -1,5 +1,15 @@
 import { Overview, TechContent, ApiResponse } from '@/types';
-import { API_BASE_URL } from './config';
+
+// API base URL - update this to match your actual API endpoint
+const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || process.env.NEXT_PUBLIC_TECH_SUMMARIZED_BASE_URL || 'http://localhost:1052';
+
+// Debug logging to verify environment variable loading (only on server side)
+if (typeof window === 'undefined') {
+  console.log('🔧 API Configuration Debug:');
+  console.log('TECH_SUMMARIZED_BASE_URL:', process.env.TECH_SUMMARIZED_BASE_URL);
+  console.log('NEXT_PUBLIC_TECH_SUMMARIZED_BASE_URL:', process.env.NEXT_PUBLIC_TECH_SUMMARIZED_BASE_URL);
+  console.log('Final API_BASE_URL:', API_BASE_URL);
+}
 
 // Fetch overviews from the API
 export async function fetchOverviews(): Promise<Overview[]> {
