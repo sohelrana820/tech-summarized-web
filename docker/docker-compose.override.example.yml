@@ -1,0 +1,19 @@
+services:
+  tech-summarized-website:
+    container_name: tech-summarized-website
+    image: tech-summarized-website:${APP_IMAGE_TAG:-latest}
+    restart: "no"
+    volumes:
+      - ../codes:/home/appuser/appsrc
+      - /home/appuser/appsrc/node_modules
+      - /home/appuser/appsrc/.next
+    healthcheck:
+      disable: true
+      test: 'exit 0'
+    networks:
+      - default_network
+
+networks:
+  default_network:
+    external: true
+    name: ${DOCKER_NETWORK:-app_common_network}

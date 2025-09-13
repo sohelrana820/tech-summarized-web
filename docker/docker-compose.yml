@@ -1,0 +1,25 @@
+services:
+  tech-summarized-website:
+    container_name: tech-summarized-website
+    image: tech-summarized-website:${APP_IMAGE_TAG:-latest}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        - TZ=${TIMEZONE}
+        - SHOULD_RUN_CHOWN_TO_APPUSER=false
+      target: ${DOCKER_BUILD_MODE}
+    ports:
+      - "${APP_PORT:-1053}:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - default_network
+
+networks:
+  default_network:
+    external: true
+    name: ${DOCKER_NETWORK:-server-common-network}
