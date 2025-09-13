@@ -1,7 +1,7 @@
 import { Overview, TechContent, ApiResponse } from '@/types';
 
 // API base URL - update this to match your actual API endpoint
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1052';
+const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'http://localhost:1052';
 
 // Fetch overviews from the API
 export async function fetchOverviews(): Promise<Overview[]> {
