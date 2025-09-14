@@ -41,13 +41,13 @@ export default function OverviewArchivePage() {
 
   if (loading) {
     return (
-      <div>
+      <div className="min-h-screen bg-white dark:bg-slate-900">
         <Header />
         <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
-              <p className="text-slate-600 dark:text-slate-400">Loading overview archive...</p>
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500 dark:text-blue-400" />
+              <p className="text-slate-600 dark:text-slate-300">Loading overview archive...</p>
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function OverviewArchivePage() {
 
   if (error) {
     return (
-      <div>
+      <div className="min-h-screen bg-white dark:bg-slate-900">
         <Header />
         <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
           <div className="text-center">
