@@ -8,9 +8,10 @@ interface CardProps {
   className?: string;
   hover?: boolean;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
-export function Card({ children, className, hover = false, onClick }: CardProps) {
+export function Card({ children, className, hover = false, onClick, style }: CardProps) {
   return (
     <div
       className={clsx(
@@ -23,6 +24,7 @@ export function Card({ children, className, hover = false, onClick }: CardProps)
         className
       )}
       onClick={onClick}
+      style={style}
     >
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-slate-50/30 dark:from-slate-800/30 dark:via-transparent dark:to-slate-900/50 pointer-events-none" />

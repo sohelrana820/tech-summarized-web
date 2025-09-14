@@ -60,7 +60,7 @@ export function ContentItem({ contentItem, isRead, onMarkAsRead }: ContentItemPr
   };
 
   return (
-    <Card className="relative group transition-all duration-300 ease-out hover:shadow-lg hover:shadow-slate-300/50 dark:hover:shadow-slate-800/50 overflow-visible" style={{ zIndex: 1 }}>
+    <Card className="relative group transition-all duration-300 ease-out hover:shadow-lg hover:shadow-slate-300/50 dark:hover:shadow-slate-800/50 overflow-visible" style={{ zIndex: 1 } as React.CSSProperties}>
       <CardContent className="p-8 pt-12 relative overflow-visible">
         <div className="flex items-start">
           <div className="flex-1">

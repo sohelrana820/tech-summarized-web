@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Production optimizations
-  output: 'standalone',
+  // output: 'standalone', // Temporarily disabled
   
   // Allow cross-origin requests from production domain
   allowedDevOrigins: [
@@ -11,22 +11,6 @@ const nextConfig: NextConfig = {
     'https://www.techsummarized.com',
     'http://www.techsummarized.com',
   ],
-  
-  // Additional configuration for cross-origin issues
-  experimental: {
-    allowedDevOrigins: [
-      'https://techsummarized.com',
-      'http://techsummarized.com',
-      'https://www.techsummarized.com',
-      'http://www.techsummarized.com',
-    ],
-  },
-  
-  // Disable the cross-origin warning in development
-  devIndicators: {
-    buildActivity: false,
-    buildActivityPosition: 'bottom-right',
-  },
   
   // CORS configuration for API calls
   async headers() {
