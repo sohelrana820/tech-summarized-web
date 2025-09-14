@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { Overview, TechContent, ApiResponse } from '@/types';
-import { sampleOverviews, sampleTechContent } from '@/data/sampleData';
 
 // API base URL from environment variable with fallback
 const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'http://154.53.45.82:1052';
@@ -50,9 +49,7 @@ export async function fetchOverviews(): Promise<Overview[]> {
     return data.data;
   } catch (error) {
     console.error('Error fetching overviews:', error);
-    // Return sample data as fallback when API is not available
-    console.log('Using sample data for overviews');
-    return sampleOverviews;
+    throw error;
   }
 }
 
@@ -64,13 +61,7 @@ export async function fetchTechContentBySlug(slug: string): Promise<TechContent[
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
-    // Return sample data filtered by slug as fallback
-    console.log('Using sample data for tech content by slug:', slug);
-    const overview = sampleOverviews.find(o => o.slug === slug);
-    if (overview) {
-      return sampleTechContent.filter(content => content.overview_id === overview.id);
-    }
-    return [];
+    throw error;
   }
 }
 
@@ -82,9 +73,7 @@ export async function fetchTechContent(overviewId: number): Promise<TechContent[
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
-    // Return sample data filtered by overview ID as fallback
-    console.log('Using sample data for tech content by ID:', overviewId);
-    return sampleTechContent.filter(content => content.overview_id === overviewId);
+    throw error;
   }
 }
 
@@ -96,9 +85,7 @@ export async function fetchAllTechContent(): Promise<TechContent[]> {
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
-    // Return all sample data as fallback
-    console.log('Using sample data for all tech content');
-    return sampleTechContent;
+    throw error;
   }
 }
 
