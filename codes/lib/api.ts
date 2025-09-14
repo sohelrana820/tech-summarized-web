@@ -1,18 +1,52 @@
+import 'dotenv/config';
 import { Overview, TechContent, ApiResponse } from '@/types';
 import { sampleOverviews, sampleTechContent } from '@/data/sampleData';
 
-// API base URL - update this to match your actual API endpoint
-const API_BASE_URL = 'http://localhost:1052';
+// API base URL from environment variable with fallback
+const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'http://localhost:1052';
+
+// HTTP client configuration
+const HTTP_CONFIG = {
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
+
+// HTTP client function that mimics axios behavior
+async function httpClient(url: string, options: RequestInit = {}) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), HTTP_CONFIG.timeout);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: { ...HTTP_CONFIG.headers, ...options.headers },
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return {
+      data: await response.json(),
+      status: response.status,
+      statusText: response.statusText,
+    };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
 
 // Fetch overviews from the API
 export async function fetchOverviews(): Promise<Overview[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/daily/overviews`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch overviews');
-    }
-    
-    const data: ApiResponse<Overview> = await response.json();
+    const response = await httpClient(`${API_BASE_URL}/posts/daily/overviews`);
+    const data: ApiResponse<Overview> = response.data;
     return data.data;
   } catch (error) {
     console.error('Error fetching overviews:', error);
@@ -25,12 +59,8 @@ export async function fetchOverviews(): Promise<Overview[]> {
 // Fetch tech content for a specific overview by slug
 export async function fetchTechContentBySlug(slug: string): Promise<TechContent[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/daily/summarized/${slug}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch tech content');
-    }
-    
-    const data: ApiResponse<TechContent> = await response.json();
+    const response = await httpClient(`${API_BASE_URL}/posts/daily/summarized/${slug}`);
+    const data: ApiResponse<TechContent> = response.data;
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
@@ -47,12 +77,8 @@ export async function fetchTechContentBySlug(slug: string): Promise<TechContent[
 // Fetch tech content for a specific overview by ID (legacy support)
 export async function fetchTechContent(overviewId: number): Promise<TechContent[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/daily/summarized?overview_id=${overviewId}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch tech content');
-    }
-    
-    const data: ApiResponse<TechContent> = await response.json();
+    const response = await httpClient(`${API_BASE_URL}/posts/daily/summarized?overview_id=${overviewId}`);
+    const data: ApiResponse<TechContent> = response.data;
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
@@ -65,12 +91,8 @@ export async function fetchTechContent(overviewId: number): Promise<TechContent[
 // Fetch all tech content
 export async function fetchAllTechContent(): Promise<TechContent[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/daily/summarized`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch tech content');
-    }
-    
-    const data: ApiResponse<TechContent> = await response.json();
+    const response = await httpClient(`${API_BASE_URL}/posts/daily/summarized`);
+    const data: ApiResponse<TechContent> = response.data;
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
