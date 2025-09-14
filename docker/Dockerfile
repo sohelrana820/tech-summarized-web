@@ -75,16 +75,14 @@ USER appuser
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build \
-    && echo "Build completed, checking .next directory:" \
-    && ls -la .next/ \
-    && echo "Checking for build files:" \
-    && ls -la .next/BUILD_ID || echo "No BUILD_ID found" \
-    && ls -la .next/server/ || echo "No server directory found" \
     && npm ci --omit=dev --ignore-scripts --no-audit
 
 ######################################################
 
 FROM base AS prod
+
+# Set working directory
+WORKDIR /home/appuser/appsrc
 
 # Copy built application and dependencies from builder
 COPY --chown=appuser:appuser --from=builder /home/appuser/appsrc/node_modules ./node_modules
@@ -92,6 +90,7 @@ COPY --chown=appuser:appuser --from=builder /home/appuser/appsrc/.next ./.next
 COPY --chown=appuser:appuser --from=builder /home/appuser/appsrc/public ./public
 COPY --chown=appuser:appuser --from=builder /home/appuser/appsrc/package.json ./package.json
 COPY --chown=appuser:appuser --from=builder /home/appuser/appsrc/next.config.ts ./next.config.ts
+
 
 EXPOSE 3000
 
