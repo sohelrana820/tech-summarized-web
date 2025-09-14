@@ -3,7 +3,7 @@ import { Overview, TechContent, ApiResponse } from '@/types';
 import { sampleOverviews, sampleTechContent } from '@/data/sampleData';
 
 // API base URL from environment variable with fallback
-const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'http://localhost:1052';
+const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'http://154.53.45.82:1052';
 
 // HTTP client configuration
 const HTTP_CONFIG = {
@@ -102,13 +102,8 @@ export async function fetchAllTechContent(): Promise<TechContent[]> {
   }
 }
 
-// Utility function to format time ago (client-side only to prevent hydration issues)
+// Utility function to format time ago
 export function formatTimeAgo(dateString: string): string {
-  // Return a default value during SSR to prevent hydration mismatch
-  if (typeof window === 'undefined') {
-    return 'recently';
-  }
-  
   const date = new Date(dateString);
   const now = new Date();
   const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
