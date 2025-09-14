@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Overview, TechContent, ApiResponse } from '@/types';
 
 // API base URL from environment variable with fallback
-const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'https://techsummarized.com/apis/';
+const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'https://techsummarized.com/apis';
 
 // HTTP client configuration
 const HTTP_CONFIG = {
