@@ -1,14 +1,8 @@
 import { Overview, TechContent, ApiResponse } from '@/types';
+import { sampleOverviews, sampleTechContent } from '@/data/sampleData';
 
 // API base URL - update this to match your actual API endpoint
-const API_BASE_URL = process.env.TECH_SUMMARIZED_BASE_URL || 'http://localhost:1052';
-
-// Debug logging to verify environment variable loading (only on server side)
-if (typeof window === 'undefined') {
-  console.log('🔧 API Configuration Debug:');
-  console.log('TECH_SUMMARIZED_BASE_URL:', process.env.TECH_SUMMARIZED_BASE_URL);
-  console.log('Final API_BASE_URL:', API_BASE_URL);
-}
+const API_BASE_URL = 'http://localhost:1052';
 
 // Fetch overviews from the API
 export async function fetchOverviews(): Promise<Overview[]> {
@@ -22,8 +16,9 @@ export async function fetchOverviews(): Promise<Overview[]> {
     return data.data;
   } catch (error) {
     console.error('Error fetching overviews:', error);
-    // Return empty array as fallback
-    return [];
+    // Return sample data as fallback when API is not available
+    console.log('Using sample data for overviews');
+    return sampleOverviews;
   }
 }
 
@@ -39,7 +34,12 @@ export async function fetchTechContentBySlug(slug: string): Promise<TechContent[
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
-    // Return empty array as fallback
+    // Return sample data filtered by slug as fallback
+    console.log('Using sample data for tech content by slug:', slug);
+    const overview = sampleOverviews.find(o => o.slug === slug);
+    if (overview) {
+      return sampleTechContent.filter(content => content.overview_id === overview.id);
+    }
     return [];
   }
 }
@@ -56,8 +56,9 @@ export async function fetchTechContent(overviewId: number): Promise<TechContent[
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
-    // Return empty array as fallback
-    return [];
+    // Return sample data filtered by overview ID as fallback
+    console.log('Using sample data for tech content by ID:', overviewId);
+    return sampleTechContent.filter(content => content.overview_id === overviewId);
   }
 }
 
@@ -73,8 +74,9 @@ export async function fetchAllTechContent(): Promise<TechContent[]> {
     return data.data;
   } catch (error) {
     console.error('Error fetching tech content:', error);
-    // Return empty array as fallback
-    return [];
+    // Return all sample data as fallback
+    console.log('Using sample data for all tech content');
+    return sampleTechContent;
   }
 }
 
