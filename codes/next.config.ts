@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // Production optimizations
   output: 'standalone',
   
+  // Disable telemetry
+  telemetry: false,
+  
   // Allow cross-origin requests from production domain
   allowedDevOrigins: [
     'https://techsummarized.com',

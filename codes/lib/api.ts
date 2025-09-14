@@ -44,11 +44,18 @@ async function httpClient(url: string, options: RequestInit = {}) {
 // Fetch overviews from the API
 export async function fetchOverviews(): Promise<Overview[]> {
   try {
+    console.log('Fetching overviews from:', `${API_BASE_URL}/posts/daily/overviews`);
     const response = await httpClient(`${API_BASE_URL}/posts/daily/overviews`);
     const data: ApiResponse<Overview> = response.data;
+    console.log('Successfully fetched overviews:', data.data.length, 'items');
     return data.data;
   } catch (error) {
     console.error('Error fetching overviews:', error);
+    console.error('API URL:', `${API_BASE_URL}/posts/daily/overviews`);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      name: error instanceof Error ? error.name : 'Unknown',
+    });
     throw error;
   }
 }
