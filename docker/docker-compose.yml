@@ -8,14 +8,21 @@ services:
       args:
         - TZ=${TIMEZONE}
         - SHOULD_RUN_CHOWN_TO_APPUSER=false
-      target: ${DOCKER_BUILD_MODE}
+      target: ${DOCKER_BUILD_MODE:-prod}
     ports:
       - "${APP_PORT:-1053}:3000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV:-production}
       - PORT=3000
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - TECH_SUMMARIZED_BASE_URL=${TECH_SUMMARIZED_BASE_URL:-https://techsummarized.com/apis}
+      - NEXT_TELEMETRY_DISABLED=${NEXT_TELEMETRY_DISABLED:-1}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - default_network
 
